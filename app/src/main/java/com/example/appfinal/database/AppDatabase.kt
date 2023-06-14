@@ -10,7 +10,7 @@ import com.example.appfinal.dao.UserDao
 import com.example.appfinal.entity.Travel
 import com.example.appfinal.entity.User
 
-@Database(entities = [User::class, Travel::class], version = 1)
+@Database(entities = [User::class, Travel::class], version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
@@ -23,7 +23,7 @@ abstract class AppDatabase : RoomDatabase() {
             val instance = Room.databaseBuilder(
                 application.applicationContext,
                 AppDatabase ::class.java,
-                "meu-db2"
+                "meu-db3"
             ).build()
             INSTANCE = instance
             instance

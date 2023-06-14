@@ -27,8 +27,9 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(
-    onNavigateHome: () -> Unit,
+    onNavigateHome: (id: Int) -> Unit,
     onNavigateCadastroUsuario: () -> Unit,
+    onNavigateListarViagens: () -> Unit,
     onNavigateCadastroViagem: (id: Int) -> Unit
 ) {
     val application = LocalContext.current.applicationContext as Application
@@ -43,27 +44,19 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val ctx = LocalContext.current
-        var usuario by remember { mutableStateOf("") }
-        var senha by remember { mutableStateOf("") }
-
-        Image( //imagem
+        Image(
             painter = painterResource(id = R.drawable.viagpng),
             contentDescription = "",
             modifier = Modifier.size(280.dp)
         )
-
         Spacer(modifier = Modifier.height(10.dp))
-
         OutlinedTextField(
-            //campo usuário
             value = viewModel.name,
             onValueChange = { viewModel.name = it },
             label = { Text("Usuário") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
         OutlinedTextField(
-            //campo senha
             value = viewModel.passoword,
             onValueChange = { viewModel.passoword = it },
             label = { Text("Senha") },
@@ -76,8 +69,8 @@ fun LoginScreen(
             onClick = {
                 val isValidUser = viewModel.verifyIfUserExists()
                 if (isValidUser) {
-                    onNavigateCadastroViagem.invoke(viewModel.userTravel(viewModel.name))
-
+//                    onNavigateCadastroViagem.invoke(viewModel.userTravel(viewModel.name))
+                    onNavigateHome.invoke(viewModel.userTravel(viewModel.name))
                 } else {
                     println("erro <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
                 }

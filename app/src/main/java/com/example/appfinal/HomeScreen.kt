@@ -1,5 +1,6 @@
 package com.example.appfinal
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,14 +20,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(userID: String) {
+
+    println("--> $userID")
     val navController = rememberNavController()
     Scaffold(
         bottomBar = {
             BottomNavigation {
                 BottomNavigationItem(selected = true,
                     onClick = {
-                        navController.navigate("novo")
+                        navController.navigate("cadastroViagem/{userID}")
                     },
                     label = {
                         Text(text = "Novo")
@@ -38,7 +41,7 @@ fun HomeScreen() {
 
                 BottomNavigationItem(selected = false,
                     onClick = {
-                        navController.navigate("viagens")
+                        navController.navigate("listarViagem")
                     },
                     label = {
                         Text(text = "Viagens")
@@ -63,12 +66,9 @@ fun HomeScreen() {
         }
     ) {
         Column() {
-            Text(text = "Texto fixo Scaffold HomeScreen")
-            Spacer(modifier = Modifier.height(50.dp))
-
             NavHost(
                 navController = navController,
-                startDestination = "novo",
+                startDestination = "listarViagem",
                 modifier = Modifier.padding(paddingValues = it)
             ) {
                 composable("novo") {
@@ -78,15 +78,20 @@ fun HomeScreen() {
                     "cadastroViagem/{userID}",
                     arguments = listOf(navArgument("userID") { type = NavType.StringType })
                 ) {
-                    val id = it.arguments?.getString("userID")
-                    if (id != null) {
+                    if (userID != null) {
+                        Log.i(userID, "$userID Logou")
                         TelaViagens(
-                            onBackNavigate = { navController.navigateUp() }, id
+                            onNavigateHome = { navController.navigateUp() },
+                            userID
                         )
                     }
                 }
                 composable("sobre") {
+                    println("Clicou sobre")
                     TelaSobre()
+                }
+                composable("listarViagem") {
+                    ListTravels()
                 }
             }
         }

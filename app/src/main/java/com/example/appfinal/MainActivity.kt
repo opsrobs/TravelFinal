@@ -41,37 +41,52 @@ fun MyApp() {
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
-            LoginScreen(onNavigateHome = {
-                navController.navigate("home")
-            },
+            LoginScreen(
+                onNavigateHome = { id ->
+                    navController.navigate("home/$id")
+                },
                 onNavigateCadastroUsuario = {
                     navController.navigate("cadastroUsuario")
                 },
                 onNavigateCadastroViagem = { id ->
                     navController.navigate("cadastroViagem/$id")
-                }
+                },
+                onNavigateListarViagens = {
+                    navController.navigate("listarViagem")
+                },
             )
         }
 
-        composable("home") {
-            HomeScreen(/*onNavigateHome = {
-                navController.navigate("home")
-            }*/
-            )
+        composable(
+            "home/{userID}",
+            arguments = listOf(navArgument("userID") { type = NavType.StringType })
+        ) {
+            val id = it.arguments?.getString("userID")
+            if (id != null) {
+                HomeScreen(
+//                    onNavigateListarViagens = { navController.navigateUp() },
+                    id
+                )
+            }
         }
         composable("cadastroUsuario") {
             TelaCadastroUsuario {
                 navController.navigateUp()
             }
         }
+        composable("listarViagem") {
+            ListTravels ()
+        }
 
-        composable("cadastroViagem/{userID}",
+        composable(
+            "cadastroViagem/{userID}",
             arguments = listOf(navArgument("userID") { type = NavType.StringType })
         ) {
             val id = it.arguments?.getString("userID")
             if (id != null) {
                 TelaViagens(
-                    onBackNavigate = { navController.navigateUp() }, id
+                    onNavigateHome = { navController.navigateUp() },
+                    id
                 )
             }
         }

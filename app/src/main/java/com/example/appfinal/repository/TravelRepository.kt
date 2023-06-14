@@ -13,4 +13,11 @@ class TravelRepository(private val travelDao: TravelDao) {
             travelDao.insert(travel)
         }
     }
+
+    suspend fun getAllTravels(): List<Travel> {
+        return withContext(Dispatchers.IO) {
+            travelDao.findAll()
+        }
+    }
+
 }

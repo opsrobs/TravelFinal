@@ -10,6 +10,7 @@ data class Travel(
     val destino: String,
     val dataInicio: String,
     val dataFinal: String,
-    val orcamento: Float
+    val orcamento: Float,
+    val reason: Int
 ) {
 }
