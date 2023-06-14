@@ -138,7 +138,7 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
 
             Button(
                 onClick = {
-                    viewModel.register(0)
+                    viewModel.register(Integer.parseInt(userID))
                     println()
                     onNavigateHome()
                 },
