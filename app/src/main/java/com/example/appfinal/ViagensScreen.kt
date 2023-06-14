@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appfinal.viewModel.RegisterNewTravelFactory
 import com.example.appfinal.viewModel.RegisterNewTravelModel
@@ -153,10 +154,10 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
     }
 }
 
-fun checkFields(viewModel: YourViewModelClass): Boolean {
+fun checkFields(viewModel: RegisterNewTravelModel): Boolean {
     return viewModel.orcamento != null &&
             viewModel.destino?.isNotEmpty() == true &&
-            viewModel.dataInicio?.isNotEmpty() == true &&
+            viewModel.datainicio?.isNotEmpty() == true &&
             viewModel.dataFim?.isNotEmpty() == true
 }
 
