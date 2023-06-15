@@ -27,11 +27,15 @@ class RegisterNewTravelModel(private val travelRepository: TravelRepository):Vie
 
     }
 
+    fun updateExpenses(id: Int, orcamento: Float){
+        travelRepository.attATravel(id, orcamento)
+    }
+
     val travels: MutableStateFlow<List<Travel>> = MutableStateFlow(emptyList())
 
-    fun getTravels() {
+    fun getTravels(userId: Int) {
         viewModelScope.launch {
-            val travelsRepo = travelRepository.getAllTravels()
+            val travelsRepo = travelRepository.getAllTravels(userId)
             travels.value = travelsRepo
         }
     }

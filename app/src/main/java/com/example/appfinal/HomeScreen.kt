@@ -72,7 +72,7 @@ fun HomeScreen(userID: String) {
                 modifier = Modifier.padding(paddingValues = it)
             ) {
                 composable("novo") {
-                    TelaNovo()
+//                    TelaNovo()
                 }
                 composable(
                     "cadastroViagem/{userID}",
@@ -91,7 +91,12 @@ fun HomeScreen(userID: String) {
                     TelaSobre()
                 }
                 composable("listarViagem") {
-                    ListTravels()
+                    if (userID != null) {
+                        ListTravels(
+                            userID,
+                            onNavigateHome = { navController.navigateUp() }
+                        )
+                    }
                 }
             }
         }

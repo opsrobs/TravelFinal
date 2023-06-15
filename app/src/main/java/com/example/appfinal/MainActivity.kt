@@ -22,13 +22,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppFinalTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
                     MyApp()
-                    //Greeting("Android")
                 }
             }
         }
@@ -64,7 +62,6 @@ fun MyApp() {
             val id = it.arguments?.getString("userID")
             if (id != null) {
                 HomeScreen(
-//                    onNavigateListarViagens = { navController.navigateUp() },
                     id
                 )
             }
@@ -74,8 +71,15 @@ fun MyApp() {
                 navController.navigateUp()
             }
         }
-        composable("listarViagem") {
-            ListTravels ()
+        composable(
+            "listarViagem",
+            arguments = listOf(navArgument("userID") { type = NavType.StringType })
+        ) {
+            val id = it.arguments?.getString("userID")
+            if (id != null) {
+                ListTravels(id,
+                    onNavigateHome = { navController.navigateUp() })
+            }
         }
 
         composable(

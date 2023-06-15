@@ -14,9 +14,15 @@ class TravelRepository(private val travelDao: TravelDao) {
         }
     }
 
-    suspend fun getAllTravels(): List<Travel> {
+    suspend fun getAllTravels(userId: Int): List<Travel> {
         return withContext(Dispatchers.IO) {
-            travelDao.findAll()
+            travelDao.findAllByUserId(userId)
+        }
+    }
+
+    fun attATravel(id: Int,  orcamento: Float){
+        coroutine.launch(Dispatchers.IO){
+            travelDao.incrementExpenses(id,orcamento)
         }
     }
 

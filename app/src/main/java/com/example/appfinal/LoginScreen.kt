@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -17,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appfinal.viewModel.RegisterNewUserViewModel
@@ -36,11 +38,9 @@ fun LoginScreen(
     val viewModel: RegisterNewUserViewModel = viewModel(
         factory = RegisterNewUserViewModelFactory(application)
     )
-
     Column(
         modifier = Modifier
             .fillMaxSize(),
-        //.background(Color.LightGray),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -65,27 +65,25 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(20.dp))
 
-        Button( //botão entrar
+        Button(
             onClick = {
                 val isValidUser = viewModel.verifyIfUserExists()
                 if (isValidUser) {
-//                    onNavigateCadastroViagem.invoke(viewModel.userTravel(viewModel.name))
                     onNavigateHome.invoke(viewModel.userTravel(viewModel.name))
                 } else {
                     println("erro <<<<<<<<<<<<<<<<<<<<<<<<<<<<")
                 }
             },
             modifier = Modifier
-                //.fillMaxWidth()
                 .width(280.dp)
                 .height(60.dp),
-            colors = ButtonDefaults.buttonColors(backgroundColor = Color.Cyan),
-            contentPadding = PaddingValues(16.dp)
-        ) {
-            Text(text = "Entrar")
-        }
 
-        TextButton( //botão cadastrar
+            colors = ButtonDefaults.buttonColors(backgroundColor = Color("#a2c9c6".toColorInt())),
+                    contentPadding = PaddingValues(16.dp)
+        ) {
+            Text(text = "Login")
+        }
+        TextButton(
             onClick = { onNavigateCadastroUsuario() },
             modifier = Modifier.align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.textButtonColors(backgroundColor = Color.Transparent)

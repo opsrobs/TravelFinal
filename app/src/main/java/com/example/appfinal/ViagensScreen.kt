@@ -38,12 +38,6 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
     )
 
     var selectedOption by remember { mutableStateOf(0) }
-
-    println("ID do usuário: $userID <----")
-
-    var destination by remember { mutableStateOf("") }
-
-    var budget by remember { mutableStateOf("") }
     Scaffold(topBar =
     { TopAppBar(title = { Text(text = "Nova Viagem! :)") }, navigationIcon = { }) }) {
         Column(
