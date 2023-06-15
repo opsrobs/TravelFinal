@@ -36,15 +36,13 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
     val viewModel: RegisterNewTravelModel = viewModel(
         factory = RegisterNewTravelFactory(application)
     )
-    var showDialog by remember { mutableStateOf(false) }
-    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
     var selectedOption by remember { mutableStateOf(0) }
 
     println("ID do usuário: $userID <----")
 
     var destination by remember { mutableStateOf("") }
-    var startDate by remember { mutableStateOf(Date()) }
-    var endDate by remember { mutableStateOf(Date()) }
+
     var budget by remember { mutableStateOf("") }
     Scaffold(topBar =
     { TopAppBar(title = { Text(text = "Nova Viagem! :)") }, navigationIcon = { }) }) {
@@ -65,38 +63,7 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
                 horizontalArrangement = Arrangement.SpaceEvenly, // espaço igual entre os elementos
                 modifier = Modifier.fillMaxWidth() // preenche a largura máxima disponível
             ) {
-                Column {
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier
-                            .height(40.dp)
-                    ) {
-                        Text("Data de entrada")
-                    }
-
-                    DatePickerDialog(showDialog, { showDialog = false }) { newDate ->
-                        startDate = newDate
-                        showDialog = false
-                    }
-                    viewModel.datainicio = dateFormatter.format(startDate)
-                }
-
-                Column {
-                    Button(
-                        onClick = { showDialog = true },
-                        modifier = Modifier
-                            .height(40.dp)
-                    ) {
-                        Text("Data de Saida")
-                    }
-
-                    DatePickerDialog(showDialog, { showDialog = false }) { newDate ->
-                        endDate = newDate
-                        showDialog = false
-                    }
-                    viewModel.dataFim = dateFormatter.format(endDate)
-                    print(dateFormatter.format(endDate))
-                }
+                dateButtons(viewModel)
             }
             OutlinedTextField(
                 value = viewModel.datainicio,
@@ -138,9 +105,12 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
 
             Button(
                 onClick = {
-                    viewModel.register(Integer.parseInt(userID))
-                    println()
-                    onNavigateHome()
+                    if (checkFields(viewModel)) {
+                        viewModel.register(Integer.parseInt(userID))
+                        println()
+                        onNavigateHome()
+
+                    }
                 },
                 modifier = Modifier
                     .padding(top = 16.dp)
@@ -151,6 +121,47 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun dateButtons(viewModel: RegisterNewTravelModel){
+    var showDialogStart by remember { mutableStateOf(false) }
+    var showDialogEnd by remember { mutableStateOf(false) }
+    val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    var startDate by remember { mutableStateOf(Date()) }
+    var endDate by remember { mutableStateOf(Date()) }
+    Column {
+        Button(
+            onClick = { showDialogStart = true },
+            modifier = Modifier
+                .height(40.dp)
+        ) {
+            Text("Data de entrada")
+        }
+
+        DatePickerDialog(showDialogStart, { showDialogStart = false }) { newDate ->
+            startDate = newDate
+            showDialogStart = false
+        }
+        viewModel.datainicio = dateFormatter.format(startDate)
+    }
+
+    Column {
+        Button(
+            onClick = { showDialogEnd = true },
+            modifier = Modifier
+                .height(40.dp)
+        ) {
+            Text("Data de Saida")
+        }
+
+        DatePickerDialog(showDialogEnd, { showDialogEnd = false }) { newDate ->
+            endDate = newDate
+            showDialogEnd = false
+        }
+        viewModel.dataFim = dateFormatter.format(endDate)
+        print(dateFormatter.format(endDate))
     }
 }
 
@@ -170,7 +181,6 @@ fun DatePickerDialog(
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = onDismiss) {
-            // Use the Android date picker
             android.app.DatePickerDialog(LocalContext.current, { _, year, month, dayOfMonth ->
                 onDateSet(GregorianCalendar(year, month, dayOfMonth).time)
             }, 2023, 6, 12).show()
