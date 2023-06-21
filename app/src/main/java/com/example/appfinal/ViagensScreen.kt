@@ -21,10 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.appfinal.viewModel.RegisterNewTravelFactory
-import com.example.appfinal.viewModel.RegisterNewTravelModel
-import com.example.appfinal.viewModel.RegisterNewUserViewModel
-import com.example.appfinal.viewModel.RegisterNewUserViewModelFactory
+import com.example.appfinal.viewModel.*
+import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -36,6 +34,11 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
     val viewModel: RegisterNewTravelModel = viewModel(
         factory = RegisterNewTravelFactory(application)
     )
+    val expenseModel: RegisterNewExpenseModel = viewModel(
+        factory = RegisterNewExpenseFactory(application)
+    )
+
+    val scope = rememberCoroutineScope()
 
     var selectedOption by remember { mutableStateOf(0) }
     Scaffold(topBar =
@@ -72,8 +75,8 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             )
             OutlinedTextField(
-                value = viewModel.orcamento.toString(),
-                onValueChange = { viewModel.orcamento = it.toFloatOrNull() ?: 0f },
+                value = expenseModel.valueExpense.toString(),
+                onValueChange = { expenseModel.valueExpense = it.toFloatOrNull() ?: 0f },
                 label = { Text("Orçamento") },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(
@@ -99,10 +102,15 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
 
             Button(
                 onClick = {
-                    if (checkFields(viewModel)) {
-                        viewModel.register(Integer.parseInt(userID))
-                        println()
-                        onNavigateHome()
+                    var id = 0
+
+                    scope.launch {
+                        if (checkFields(viewModel)) {
+                            viewModel.register(Integer.parseInt(userID))
+                            expenseModel.register(viewModel.getTravelByName(viewModel.destino))
+                            println("F!")
+                            onNavigateHome()
+                        }
 
                     }
                 },
@@ -119,7 +127,7 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
 }
 
 @Composable
-fun dateButtons(viewModel: RegisterNewTravelModel){
+fun dateButtons(viewModel: RegisterNewTravelModel) {
     var showDialogStart by remember { mutableStateOf(false) }
     var showDialogEnd by remember { mutableStateOf(false) }
     val dateFormatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

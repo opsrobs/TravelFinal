@@ -6,6 +6,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,22 +30,32 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.appfinal.HomeScreen
+import com.example.appfinal.entity.Expense
 import com.example.appfinal.entity.Travel
-import com.example.appfinal.viewModel.RegisterNewTravelModel
-import com.example.appfinal.viewModel.RegisterNewTravelViewModelFactory
-import com.example.appfinal.viewModel.RegisterNewUserViewModel
-import com.example.appfinal.viewModel.RegisterNewUserViewModelFactory
+import com.example.appfinal.entity.TravelWithExpense
+import com.example.appfinal.viewModel.*
+import kotlinx.coroutines.launch
 
 @Composable
 fun screen(
-    travels: Travel,
+    travels: TravelWithExpense,
     iconReason: Int,
     isItemSelected: Boolean,
     viewModel: RegisterNewTravelModel,
-    onCardClick: (Travel) -> Unit,
+    onCardClick: (TravelWithExpense) -> Unit,
     onNavigateHome: () -> Unit,
 ) {
+    val application = LocalContext.current.applicationContext as Application
+    val expenseViewModel: RegisterNewExpenseModel = viewModel(
+        factory = RegisterNewExpenseFactory(application)
+    )
+    var id by remember { mutableStateOf(0) }
 
+    var descriptionText by remember {
+        mutableStateOf("")
+    }
+
+    val scope = rememberCoroutineScope()
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -62,25 +74,28 @@ fun screen(
             Row(modifier = Modifier.padding(4.dp)) {
                 Column {
                     Text(
-                        text = travels.destino,
-                        style = MaterialTheme.typography.subtitle1
+                        text = travels.destino, style = MaterialTheme.typography.subtitle1
                     )
                     Text(
                         text = "${travels.dataInicio} --> ${travels.dataFinal}",
                         style = MaterialTheme.typography.subtitle2
                     )
                     Text(
-                        text = "Valor Total: ${formatFloat(travels.orcamento)}R$",
+                        text = "Valor Total: ${formatFloat(travels.valueExpense)}R$",
                         style = MaterialTheme.typography.subtitle2
                     )
                 }
             }
-
         }
-
     }
     if (isItemSelected) {
-        moreExpenses(travels, viewModel = viewModel)
+        moreExpenses(
+            descriptionText = descriptionText,
+            travels = travels,
+            viewModel = viewModel,
+            onDescriptionTextChanged = {
+                descriptionText = it
+            })
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -90,10 +105,16 @@ fun screen(
         ) {
             Button(
                 onClick = {
-                    viewModel.updateExpenses(travels.id, calculateExpense(travels.orcamento,viewModel.orcamento))
-                    onNavigateHome()
-                },
-                modifier = Modifier
+                    scope.launch {
+                        val id = travels.travelID
+                        expenseViewModel.registerValueOnExpense(
+                            id, descriptionText, viewModel.orcamento
+                        )
+                        descriptionText = ""
+                        viewModel.getTravelsWithExpenses(travels.userID)
+                        onNavigateHome()
+                    }
+                }, modifier = Modifier
                     .padding(top = 16.dp)
                     .width(150.dp)
             ) {
@@ -101,26 +122,75 @@ fun screen(
             }
         }
     }
-
 }
+
+@Composable
+fun ListExpenses(travelId: String) {
+    val application = LocalContext.current.applicationContext as Application
+    val viewModel: RegisterNewExpenseModel = viewModel(
+        factory = RegisterNewExpenseFactory(application)
+    )
+    viewModel.getExpenses(Integer.parseInt(travelId))
+    val expenses by viewModel.expenseTravel.collectAsState()
+    println(expenses)
+    LazyColumn(
+        modifier = Modifier
+            .height(150.dp)
+            .width(1000.dp)
+    ) {
+        items(items = expenses) {
+            expensesPresent(expense = it)
+            println(it)
+
+        }
+    }
+}
+
+@Composable
+fun expensesPresent(expense: Expense) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Row {
+            Text(
+                text = expense.descriptionExpense,
+                modifier = Modifier
+                    .weight(1.0f)
+                    .border(1.dp, Color.Black)
+                    .padding(4.dp)
+            )
+            Text(
+                text = expense.valueExpense.toString(),
+                modifier = Modifier
+                    .weight(1.0f)
+                    .border(1.dp, Color.Black)
+                    .padding(4.dp)
+            )
+        }
+    }
+}
+
 
 fun formatFloat(number: Float): String {
     return String.format("%.2f", number)
 }
 
 // Uso:
-fun calculateExpense(oldExpense: Float, newExpense: Float): Float {
-    if (newExpense != 0.0f) {
-        return oldExpense + newExpense
-    } else {
-        return oldExpense
-    }
-}
 
 
 @Composable
-fun moreExpenses(travels: Travel, viewModel: RegisterNewTravelModel) {
-    var orcamento = travels.orcamento
+fun moreExpenses(
+    descriptionText: String,
+    travels: TravelWithExpense,
+    viewModel: RegisterNewTravelModel,
+    onDescriptionTextChanged: (String) -> Unit
+) {
+    var orcamento = travels.valueExpense
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -128,16 +198,15 @@ fun moreExpenses(travels: Travel, viewModel: RegisterNewTravelModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        ListExpenses(travels.travelID.toString())
         OutlinedTextField(
             value = orcamento.toString(),
             onValueChange = { orcamento = it.toFloatOrNull() ?: 0f },
             label = { Text("Despesa atual") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = {
+            keyboardActions = KeyboardActions(onNext = {
 
-                }
-            ),
+            }),
             modifier = Modifier.padding(16.dp),
             enabled = false
         )
@@ -146,19 +215,28 @@ fun moreExpenses(travels: Travel, viewModel: RegisterNewTravelModel) {
             onValueChange = { viewModel.orcamento = it.toFloatOrNull() ?: 0f },
             label = { Text("Nova Despesa") },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            keyboardActions = KeyboardActions(
-                onNext = {
+            keyboardActions = KeyboardActions(onNext = {
 
-                }
-            ),
-            modifier = Modifier.padding(16.dp)
+            }),
+            modifier = Modifier.padding(6.dp)
         ).toString()
+        OutlinedTextField(
+            value = descriptionText,
+            onValueChange = {
+                onDescriptionTextChanged(it)
+
+//                test = it
+            },
+            label = { Text("Descrição") },
+            enabled = true
+        )
+
     }
 
 }
 
 @Composable
-fun ListTravels(userID: String, onNavigateHome:() -> Unit) {
+fun ListTravels(userID: String, onNavigateHome: () -> Unit) {
     val application = LocalContext.current.applicationContext as Application
     val viewModel: RegisterNewTravelModel = viewModel(
         factory = RegisterNewTravelViewModelFactory(application)
@@ -166,8 +244,8 @@ fun ListTravels(userID: String, onNavigateHome:() -> Unit) {
 
     val selectedTravelId = remember { mutableStateOf<Int?>(null) }
 
-    viewModel.getTravels(Integer.parseInt(userID))
-    val travels by viewModel.travels.collectAsState()
+    viewModel.getTravelsWithExpenses(Integer.parseInt(userID))
+    val travels by viewModel.travelsWithExpense.collectAsState()
 
 
     LazyColumn() {
@@ -178,8 +256,9 @@ fun ListTravels(userID: String, onNavigateHome:() -> Unit) {
             }
             screen(travel, iconReason, selectedTravelId.value != null, viewModel, onCardClick = {
                 selectedTravelId.value = it.id
-            },
-                onNavigateHome = { selectedTravelId.value = null })
+            }, onNavigateHome = { selectedTravelId.value = null })
         }
     }
 }
+
+
