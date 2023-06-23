@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,7 +50,8 @@ fun screen(
     val expenseViewModel: RegisterNewExpenseModel = viewModel(
         factory = RegisterNewExpenseFactory(application)
     )
-    var id by remember { mutableStateOf(0) }
+    val focusManager = LocalFocusManager.current
+
 
     var descriptionText by remember {
         mutableStateOf("")
@@ -59,7 +61,10 @@ fun screen(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCardClick(travels) },
+            .clickable {
+                onCardClick(travels)
+                focusManager.clearFocus()
+            },
         elevation = 8.dp,
         backgroundColor = Color.White,
     ) {
@@ -99,7 +104,8 @@ fun screen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = 16.dp)
+                .clickable { focusManager.clearFocus() },
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -148,10 +154,13 @@ fun ListExpenses(travelId: String) {
 
 @Composable
 fun expensesPresent(expense: Expense) {
+    val focusManager = LocalFocusManager.current
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable { focusManager.clearFocus() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
@@ -190,11 +199,14 @@ fun moreExpenses(
     onDescriptionTextChanged: (String) -> Unit
 ) {
     var orcamento = travels.valueExpense
+    val focusManager = LocalFocusManager.current
+
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp)
+            .clickable { focusManager.clearFocus() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

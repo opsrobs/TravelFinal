@@ -14,6 +14,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -25,7 +26,8 @@ import com.example.appfinal.viewModel.RegisterNewUserViewModelFactory
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TelaCadastroUsuario(onBackNavigate: () -> Unit){
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     val application = LocalContext.current.applicationContext as Application
     val viewModel: RegisterNewUserViewModel = viewModel(
         factory = RegisterNewUserViewModelFactory(application)
@@ -33,7 +35,8 @@ fun TelaCadastroUsuario(onBackNavigate: () -> Unit){
 
     Column(
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .clickable { focusManager.clearFocus() },
             //.background(Color.LightGray),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally

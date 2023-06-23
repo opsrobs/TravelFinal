@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -62,6 +63,18 @@ fun HomeScreen(userID: String) {
                         Icon(Icons.Filled.Add, contentDescription = "")
                     }
                 )
+
+                BottomNavigationItem(selected = false,
+                    onClick = {
+                        navController.navigate("Login")
+                    },
+                    label = {
+                        Text(text = "Sair")
+                    },
+                    icon = {
+                        Icon(Icons.Filled.ExitToApp, contentDescription = "")
+                    }
+                )
             }
         }
     ) {
@@ -90,6 +103,7 @@ fun HomeScreen(userID: String) {
                     println("Clicou sobre")
                     TelaSobre()
                 }
+//                LoginScreen
                 composable("listarViagem") {
                     if (userID != null) {
                         ListTravels(
@@ -97,6 +111,15 @@ fun HomeScreen(userID: String) {
                             onNavigateHome = { navController.navigateUp() }
                         )
                     }
+                }
+
+                composable("login") {
+                    LoginScreen(
+                        onNavigateHome = { navController.navigateUp() },
+                        onNavigateCadastroUsuario = { navController.navigate("") },
+                        onNavigateListarViagens = { navController.navigate("") },
+                        onNavigateCadastroViagem = { navController.navigate("") }
+                    )
                 }
             }
         }
