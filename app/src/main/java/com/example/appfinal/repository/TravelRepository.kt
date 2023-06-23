@@ -30,6 +30,14 @@ class TravelRepository(private val travelDao: TravelDao) {
         return userExists;
     }
 
+    suspend fun delete(travel: Travel){
+        travelDao.delete(travel = travel )
+    }
+
+    suspend fun deleteById(id:Int){
+        travelDao.deleteById(id)
+    }
+
 //    fun attATravel(id: Int,  orcamento: Float){
 //        coroutine.launch(Dispatchers.IO){
 //            travelDao.incrementExpenses(id,orcamento)

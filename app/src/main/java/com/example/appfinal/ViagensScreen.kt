@@ -42,11 +42,7 @@ fun TelaViagens(onNavigateHome: () -> Unit, userID: String) {
         factory = RegisterNewExpenseFactory(application)
     )
     val focusManager = LocalFocusManager.current
-    var showDialog by remember { mutableStateOf(false) }
-    var showDate by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-
-    var selectedOption by remember { mutableStateOf(0) }
 
 
     val context = LocalContext.current

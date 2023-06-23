@@ -36,7 +36,8 @@ class RegisterNewTravelModel(private val travelRepository: TravelRepository) : V
 
 
     val travels: MutableStateFlow<List<Travel>> = MutableStateFlow(emptyList())
-    val travelsWithExpense: MutableStateFlow<List<TravelWithExpense>> = MutableStateFlow(emptyList())
+    val travelsWithExpense: MutableStateFlow<List<TravelWithExpense>> =
+        MutableStateFlow(emptyList())
 
     fun getTravels(userId: Int) {
         viewModelScope.launch {
@@ -53,6 +54,11 @@ class RegisterNewTravelModel(private val travelRepository: TravelRepository) : V
         }
     }
 
+    fun deleteTravel(id: Int) {
+        viewModelScope.launch {
+            travelRepository.deleteById(id)
+        }
+    }
 
     fun getTravelByName(destino: String) = runBlocking {
         travelRepository.getTravelByName(destino)

@@ -91,6 +91,21 @@ fun screen(
                     )
                 }
             }
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {
+                    scope.launch {
+                        viewModel
+                       viewModel.deleteTravel(travels.id)
+                        println("deletado")
+                    }
+                }, modifier = Modifier
+                    .padding(top = 16.dp)
+                    .width(100.dp)
+            ) {
+                Text("Exluir")
+            }
+
         }
     }
     if (isItemSelected) {
