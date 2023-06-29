@@ -35,6 +35,7 @@ import com.example.appfinal.entity.Expense
 import com.example.appfinal.entity.Travel
 import com.example.appfinal.entity.TravelWithExpense
 import com.example.appfinal.viewModel.*
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -56,6 +57,8 @@ fun screen(
     var descriptionText by remember {
         mutableStateOf("")
     }
+
+    var confirmMessageDelete by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     Card(
@@ -92,19 +95,13 @@ fun screen(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    scope.launch {
-                        viewModel
-                       viewModel.deleteTravel(travels.id)
-                        println("deletado")
-                    }
-                }, modifier = Modifier
-                    .padding(top = 16.dp)
-                    .width(100.dp)
-            ) {
-                Text("Exluir")
+            Button(onClick = { confirmMessageDelete = true }) {
+                Text("Excluir")
             }
+            Spacer(modifier = Modifier.weight(weight = 0.5f))
+
+
+
 
         }
     }
@@ -142,6 +139,32 @@ fun screen(
                 Text("Atualizar")
             }
         }
+    }
+    if (confirmMessageDelete) {
+        AlertDialog(
+            title = { Text(text = "EXCLUIR") },
+            text = { Text("Você quer mesmo deletar este item?") },
+            onDismissRequest = { confirmMessageDelete = false },
+            confirmButton = {
+                Button(onClick = {
+                    viewModel.deleteTravel(travels.id)
+                    viewModel.getTravels(travels.userID)
+                    viewModel.getTravelsWithExpenses(travels.userID)
+                    confirmMessageDelete = false
+                }) {
+                    Text("Confirmar")
+
+                }
+            },
+            dismissButton = {
+                Button(onClick = { confirmMessageDelete = false }) {
+                    Text("Cancelar")
+                }
+            }
+
+        )
+        viewModel.getTravels(travels.userID)
+        viewModel.getTravelsWithExpenses(travels.userID)
     }
 }
 
@@ -216,7 +239,7 @@ fun moreExpenses(
     var orcamento = travels.valueExpense
     val focusManager = LocalFocusManager.current
 
-
+    val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
